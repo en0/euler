@@ -4,6 +4,35 @@ from math import sqrt
 from sys import setrecursionlimit
 
 
+class BreakOutStack(Exception):
+    """Raised to clear stack frame and reset"""
+    def __init__(self, *args):
+        self.args = args
+
+
+def recurse(*args):
+    raise BreakOutStack(*args)
+
+
+def tail_recursive(fn):
+    def _wrapped_tail_recursive(*args):
+        while True:
+            try:
+                return fn(*args)
+            except BreakOutStack as b:
+                args = b.args
+    return _wrapped_tail_recursive
+
+
+@tail_recursive
+def factoral(n, a = 1):
+    if n < 1:
+        raise Exception("Bad Input")
+    if n == 1:
+        return a
+    return recurse(n - 1, n * a)
+
+
 def elapsed_time():
     def decorator(func):
         def wrap(*args, **kwargs):
